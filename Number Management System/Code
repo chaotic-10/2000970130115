@@ -8,7 +8,7 @@ async function fetchURL(url) {
             return data;
         }
     } catch (error) {
-        // Handle error, e.g., ignore or log
+        
     }
     return null;
 }
