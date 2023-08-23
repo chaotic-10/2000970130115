@@ -1,0 +1,49 @@
+const fetch = require('isomorphic-fetch');
+
+async function fetchURL(url) {
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        }
+    } catch (error) {
+        // Handle error, e.g., ignore or log
+    }
+    return null;
+}
+
+async function fetchAndSortResponses(urls) {
+    const uniqueSortedNumbersSet = new Set();
+
+    for (const url of urls) {
+        const startingTime = Date.now();
+        const responseData = await fetchURL(url);
+        const elapsedTime = Date.now() - startingTime;
+
+        if (elapsedTime <= 500 && responseData !== null) {
+            const validNumbers = responseData.numbers.filter(number => Number.isInteger(number));
+            validNumbers.forEach(number => uniqueSortedNumbersSet.add(number));
+        }
+    }
+    
+    const uniqueSortedNumbersArray = [...uniqueSortedNumbersSet].sort((a, b) => a - b);
+    return uniqueSortedNumbersArray;
+}
+
+const apiUrls = [
+    'http://20.244.56.144/numbers/primes',
+    'http://20.244.56.144/numbers/fibo',
+    'http://20.244.56.144/numbers/odd',
+    'http://20.244.56.144/numbers/rand'
+];
+
+(async () => {
+    const sortedUniqueNumbersArray = await fetchAndSortResponses(apiUrls);
+
+    if (sortedUniqueNumbersArray.length > 0) {
+        console.log('Sorted Unique Numbers:', sortedUniqueNumbersArray);
+    } else {
+        console.log('No valid numbers found.');
+    }
+})();
